@@ -8,7 +8,10 @@ function InputForm(props) {
   return (
     <form
       onSubmit={(e) => {
-        props.onSubmit(e, 'newSearch');
+        props.onSubmit(
+          e,
+          `https://swapi.dev/api/people/?search=${props.currentSearchTerm}`
+        );
         props.updateNext(null);
         props.updatePrevious(null);
       }}>

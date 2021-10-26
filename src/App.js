@@ -6,41 +6,33 @@ import SearchNavBar from './components/SearchNavBar';
 
 function App() {
   const [searchResults, setSearchResults] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [nextSearch, setNextSearch] = useState(null);
-  const [previousSearch, setPreviousSearch] = useState(null);
+  const [nextSearch, setNextSearch] = useState();
+  const [previousSearch, setPreviousSearch] = useState();
   const [searchTerm, setSearchTerm] = useState();
 
   useEffect(() => {
-    async function initSearchResults() {
-      let response = await fetch(`https://swapi.dev/api/people/`);
-      let responseJSON = await response.json();
-      setNextSearch(responseJSON.next);
-      let searchResults = await responseJSON.results;
-      console.log(typeof searchResults, searchResults);
-      searchResults = await getHomeworld(searchResults);
-      searchResults = await getSpecies(searchResults);
-      setSearchResults(searchResults);
-    }
-    initSearchResults();
+    handleSearch();
   }, []);
 
   // Want to extract these but for prototyping this will do
-  async function handleSearch(event) {
-    event.preventDefault();
-    let response = await fetch(
-      `https://swapi.dev/api/people/?search=${searchTerm}`
-    );
-    console.log(response);
-    let responseJSON = await response.json();
-    setNextSearch(responseJSON.next);
-    setPreviousSearch(responseJSON.previous);
-    let searchResults = await responseJSON.results;
-    searchResults = await getHomeworld(searchResults);
-    searchResults = await getSpecies(searchResults);
-    console.table(searchResults);
-    setSearchResults(searchResults);
-    console.table(searchResults);
+  async function handleSearch(
+    event = null,
+    url = 'https://swapi.dev/api/people/?search='
+  ) {
+    try {
+      event && event.preventDefault();
+      let response = await fetch(url);
+      let responseJSON = await response.json();
+      console.log(responseJSON);
+      let searchResults = await responseJSON.results;
+      searchResults = await getHomeworld(searchResults);
+      searchResults = await getSpecies(searchResults);
+      setNextSearch(responseJSON.next);
+      setPreviousSearch(responseJSON.previous);
+      setSearchResults(searchResults);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   async function getHomeworld(searchResults) {
@@ -86,12 +78,12 @@ function App() {
         updateSearchTerm={setSearchTerm}
         currentSearchTerm={searchTerm}
       />
-      <SearchNavBar />
-      <Table
-        searchResults={searchResults}
-        setIsLoading={setIsLoading}
-        loadings={isLoading}
+      <SearchNavBar
+        onClick={handleSearch}
+        previous={previousSearch}
+        next={nextSearch}
       />
+      <Table searchResults={searchResults} />
     </div>
   );
 }

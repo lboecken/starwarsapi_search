@@ -4,40 +4,20 @@ function SearchNavBar(props) {
   return (
     <ul>
       <li>
-        <button>Previous</button>
+        <button
+          onClick={() => {
+            props.onClick(null, props.previous);
+          }}>
+          Previous
+        </button>
       </li>
       <li>
-        <button>Next</button>
-      </li>
-      <li>
-        <button>1</button>
-      </li>
-      <li>
-        <button>2</button>
-      </li>
-      <li>
-        <button>3</button>
-      </li>
-      <li>
-        <button>4</button>
-      </li>
-      <li>
-        <button>5</button>
-      </li>
-      <li>
-        <button>6</button>
-      </li>
-      <li>
-        <button>7</button>
-      </li>
-      <li>
-        <button>8</button>
-      </li>
-      <li>
-        <button>9</button>
-      </li>
-      <li>
-        <button>10</button>
+        <button
+          onClick={() => {
+            props.onClick(null, props.next);
+          }}>
+          Next
+        </button>
       </li>
     </ul>
   );
