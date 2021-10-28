@@ -3,20 +3,21 @@ import './App.css';
 import InputForm from './components/InputForm';
 import Table from './components/Table';
 import SearchNavBar from './components/SearchNavBar';
+import MethodSelector from './components/MethodSelector';
 
 function App() {
   const [searchResults, setSearchResults] = useState([]);
   const [nextSearch, setNextSearch] = useState();
   const [previousSearch, setPreviousSearch] = useState();
   const [searchTerm, setSearchTerm] = useState();
-  const [axiosOrVanilla, setAxiosOrVanilla] = useState('axios');
+  const [isAxiosOrVanilla, setAxiosOrVanilla] = useState('vanilla');
+  const axios = require('axios');
 
   useEffect(() => {
-    handleSearch();
+    handleSearchVanilla();
   }, []);
 
-  // Want to extract these but for prototyping this will do
-  async function handleSearch(
+  async function handleSearchVanilla(
     event = null,
     url = 'https://swapi.dev/api/people/?search='
   ) {
@@ -24,10 +25,9 @@ function App() {
       event && event.preventDefault();
       let response = await fetch(url);
       let responseJSON = await response.json();
-      console.log(responseJSON);
       let searchResults = await responseJSON.results;
-      searchResults = await getHomeworld(searchResults);
-      searchResults = await getSpecies(searchResults);
+      searchResults = await getHomeworldVanilla(searchResults);
+      searchResults = await getSpeciesVanilla(searchResults);
       setNextSearch(responseJSON.next);
       setPreviousSearch(responseJSON.previous);
       setSearchResults(searchResults);
@@ -36,7 +36,7 @@ function App() {
     }
   }
 
-  async function getHomeworld(searchResults) {
+  async function getHomeworldVanilla(searchResults) {
     const updatedSearchResults = await Promise.all(
       searchResults.map(async (result) => {
         let planetSearch = await fetch(result.homeworld);
@@ -48,7 +48,7 @@ function App() {
     return updatedSearchResults;
   }
 
-  async function getSpecies(searchResults) {
+  async function getSpeciesVanilla(searchResults) {
     const updatedSearchResults = await Promise.all(
       searchResults.map(async (result) => {
         let speciesSearch;
@@ -71,25 +71,72 @@ function App() {
   async function handleSearchAxios(
     event = null,
     url = 'https://swapi.dev/api/people/?search='
-  ) {}
+  ) {
+    try {
+      event && event.preventDefault();
+      let response = await axios.get(url);
+      let searchResults = await response.data.results;
+      searchResults = await getHomeworldAxios(searchResults);
+      searchResults = await getSpeciesAxios(searchResults);
+      setNextSearch(response.data.next);
+      setPreviousSearch(response.data.previous);
+      setSearchResults(searchResults);
+    } catch (e) {
+      console.log(e);
+    }
+  }
 
-  async function getHomeworldAxios(searchResults) {}
+  async function getHomeworldAxios(searchResults) {
+    const updatedSearchResults = await Promise.all(
+      searchResults.map(async (result) => {
+        let planetSearch = await axios.get(result.homeworld);
+        console.table(planetSearch);
+        result.homeworld = planetSearch.data.name;
+        return result;
+      })
+    );
+    return updatedSearchResults;
+  }
 
-  async function getSpeciesAxios(searchResults) {}
+  async function getSpeciesAxios(searchResults) {
+    const updatedSearchResults = await Promise.all(
+      searchResults.map(async (result) => {
+        let speciesSearch;
+        if (result.species.length === 0) {
+          speciesSearch = await axios.get('https://swapi.dev/api/species/1');
+          result.species = await speciesSearch.data.name;
+          return result;
+        } else {
+          speciesSearch = await axios.get(result.species[0]);
+          result.species = await speciesSearch.data.name;
+          return result;
+        }
+      })
+    );
+    return updatedSearchResults;
+  }
 
   return (
     <div>
       <h1>testing SWAPI</h1>
+      <MethodSelector
+        setAxiosOrVanilla={setAxiosOrVanilla}
+        axiosOrVanilla={isAxiosOrVanilla}
+      />
       <InputForm
+        axiosOrVanilla={isAxiosOrVanilla}
         updateSearchResults={setSearchResults}
         updateNext={setNextSearch}
         updatePrevious={setPreviousSearch}
-        onSubmit={handleSearch}
+        onSubmitVanilla={handleSearchVanilla}
+        onSubmitAxios={handleSearchAxios}
         updateSearchTerm={setSearchTerm}
         currentSearchTerm={searchTerm}
       />
       <SearchNavBar
-        onClick={handleSearch}
+        isAxiosOrVanilla={isAxiosOrVanilla}
+        onClickVanilla={handleSearchVanilla}
+        onClickAxios={handleSearchAxios}
         previous={previousSearch}
         next={nextSearch}
       />
