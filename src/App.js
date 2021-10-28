@@ -9,6 +9,7 @@ function App() {
   const [nextSearch, setNextSearch] = useState();
   const [previousSearch, setPreviousSearch] = useState();
   const [searchTerm, setSearchTerm] = useState();
+  const [axiosOrVanilla, setAxiosOrVanilla] = useState('axios');
 
   useEffect(() => {
     handleSearch();
@@ -66,6 +67,15 @@ function App() {
     );
     return updatedSearchResults;
   }
+
+  async function handleSearchAxios(
+    event = null,
+    url = 'https://swapi.dev/api/people/?search='
+  ) {}
+
+  async function getHomeworldAxios(searchResults) {}
+
+  async function getSpeciesAxios(searchResults) {}
 
   return (
     <div>
