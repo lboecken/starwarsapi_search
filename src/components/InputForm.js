@@ -12,8 +12,6 @@ function InputForm(props) {
           e,
           `https://swapi.dev/api/people/?search=${props.currentSearchTerm}`
         );
-        props.updateNext(null);
-        props.updatePrevious(null);
       }}>
       <input
         type='text'
