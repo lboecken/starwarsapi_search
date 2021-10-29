@@ -6,141 +6,131 @@ import SearchNavBar from './components/SearchNavBar';
 import MethodSelector from './components/MethodSelector';
 
 function App() {
-  const [searchResults, setSearchResults] = useState([]);
-  const [nextSearch, setNextSearch] = useState();
-  const [previousSearch, setPreviousSearch] = useState();
+  const [searchResults, setSearchResults] = useState({
+    next: null,
+    previous: null,
+    data: [],
+  });
   const [searchTerm, setSearchTerm] = useState();
-  const [isAxiosOrVanilla, setAxiosOrVanilla] = useState('vanilla');
+  const [isAxiosOrVanilla, setAxiosOrVanilla] = useState('axios');
   const axios = require('axios');
 
   useEffect(() => {
     handleSearchVanilla();
   }, []);
 
-  async function handleSearchVanilla(
+  async function handleSearch(
     event = null,
     url = 'https://swapi.dev/api/people/?search='
   ) {
     try {
       event && event.preventDefault();
-      let response = await fetch(url);
-      let responseJSON = await response.json();
-      let searchResults = await responseJSON.results;
-      searchResults = await getHomeworldVanilla(searchResults);
-      searchResults = await getSpeciesVanilla(searchResults);
-      setNextSearch(responseJSON.next);
-      setPreviousSearch(responseJSON.previous);
-      setSearchResults(searchResults);
+      if (isAxiosOrVanilla === 'vanilla') {
+        let response = await fetch(url);
+        let responseJSON = await response.json();
+        let searchResultsData = await responseJSON.results;
+        searchResultsData = await getHomeworld(searchResultsData);
+        searchResultsData = await getSpecies(searchResultsData);
+        setSearchResults({
+          next: responseJSON.next,
+          previous: responseJSON.previous,
+          data: searchResultsData,
+        });
+      } else if (isAxiosOrVanilla === 'axios') {
+        let response = await axios.get(url);
+        let searchResultsData = await response.data.results;
+        searchResultsData = await getHomeworld(searchResultsData);
+        searchResultsData = await getSpecies(searchResultsData);
+        setSearchResults({
+          next: response.data.next,
+          previous: response.data.previous,
+          data: searchResultsData,
+        });
+      }
     } catch (e) {
       console.log(e);
     }
   }
 
-  async function getHomeworldVanilla(searchResults) {
-    const updatedSearchResults = await Promise.all(
-      searchResults.map(async (result) => {
-        let planetSearch = await fetch(result.homeworld);
-        let planetSearchJSON = await planetSearch.json();
-        result.homeworld = await planetSearchJSON.name;
-        return result;
-      })
-    );
-    return updatedSearchResults;
-  }
-
-  async function getSpeciesVanilla(searchResults) {
-    const updatedSearchResults = await Promise.all(
-      searchResults.map(async (result) => {
-        let speciesSearch;
-        if (result.species.length === 0) {
-          speciesSearch = await fetch('https://swapi.dev/api/species/1');
-          let speciesSearchJSON = await speciesSearch.json();
-          result.species = await speciesSearchJSON.name;
+  async function getHomeworld(searchResults) {
+    if (isAxiosOrVanilla === 'vanilla') {
+      const updatedSearchResults = await Promise.all(
+        searchResults.map(async (result) => {
+          let planetSearch = await fetch(result.homeworld);
+          let planetSearchJSON = await planetSearch.json();
+          result.homeworld = await planetSearchJSON.name;
           return result;
-        } else {
-          speciesSearch = await fetch(result.species[0]);
-          let speciesSearchJSON = await speciesSearch.json();
-          result.species = await speciesSearchJSON.name;
+        })
+      );
+      return updatedSearchResults;
+    } else if (isAxiosOrVanilla === 'axios') {
+      const updatedSearchResults = await Promise.all(
+        searchResults.map(async (result) => {
+          let planetSearch = await axios.get(result.homeworld);
+          result.homeworld = planetSearch.data.name;
           return result;
-        }
-      })
-    );
-    return updatedSearchResults;
-  }
-
-  async function handleSearchAxios(
-    event = null,
-    url = 'https://swapi.dev/api/people/?search='
-  ) {
-    try {
-      event && event.preventDefault();
-      let response = await axios.get(url);
-      let searchResults = await response.data.results;
-      searchResults = await getHomeworldAxios(searchResults);
-      searchResults = await getSpeciesAxios(searchResults);
-      setNextSearch(response.data.next);
-      setPreviousSearch(response.data.previous);
-      setSearchResults(searchResults);
-    } catch (e) {
-      console.log(e);
+        })
+      );
+      return updatedSearchResults;
     }
   }
 
-  async function getHomeworldAxios(searchResults) {
-    const updatedSearchResults = await Promise.all(
-      searchResults.map(async (result) => {
-        let planetSearch = await axios.get(result.homeworld);
-        console.table(planetSearch);
-        result.homeworld = planetSearch.data.name;
-        return result;
-      })
-    );
-    return updatedSearchResults;
-  }
-
-  async function getSpeciesAxios(searchResults) {
-    const updatedSearchResults = await Promise.all(
-      searchResults.map(async (result) => {
-        let speciesSearch;
-        if (result.species.length === 0) {
-          speciesSearch = await axios.get('https://swapi.dev/api/species/1');
-          result.species = await speciesSearch.data.name;
-          return result;
-        } else {
-          speciesSearch = await axios.get(result.species[0]);
-          result.species = await speciesSearch.data.name;
-          return result;
-        }
-      })
-    );
-    return updatedSearchResults;
+  async function getSpecies(searchResults) {
+    if (isAxiosOrVanilla === 'vanilla') {
+      const updatedSearchResults = await Promise.all(
+        searchResults.map(async (result) => {
+          let speciesSearch;
+          if (result.species.length === 0) {
+            speciesSearch = await fetch('https://swapi.dev/api/species/1');
+            let speciesSearchJSON = await speciesSearch.json();
+            result.species = await speciesSearchJSON.name;
+            return result;
+          } else {
+            speciesSearch = await fetch(result.species[0]);
+            let speciesSearchJSON = await speciesSearch.json();
+            result.species = await speciesSearchJSON.name;
+            return result;
+          }
+        })
+      );
+      return updatedSearchResults;
+    } else if (isAxiosOrVanilla === 'axios') {
+      const updatedSearchResults = await Promise.all(
+        searchResults.map(async (result) => {
+          let speciesSearch;
+          if (result.species.length === 0) {
+            speciesSearch = await axios.get('https://swapi.dev/api/species/1');
+            result.species = await speciesSearch.data.name;
+            return result;
+          } else {
+            speciesSearch = await axios.get(result.species[0]);
+            result.species = await speciesSearch.data.name;
+            return result;
+          }
+        })
+      );
+      return updatedSearchResults;
+    }
   }
 
   return (
     <div>
-      <h1>testing SWAPI</h1>
+      <h1>Star Wars Characters Search</h1>
       <MethodSelector
         setAxiosOrVanilla={setAxiosOrVanilla}
         axiosOrVanilla={isAxiosOrVanilla}
       />
       <InputForm
-        axiosOrVanilla={isAxiosOrVanilla}
-        updateSearchResults={setSearchResults}
-        updateNext={setNextSearch}
-        updatePrevious={setPreviousSearch}
-        onSubmitVanilla={handleSearchVanilla}
-        onSubmitAxios={handleSearchAxios}
+        onSubmit={handleSearch}
         updateSearchTerm={setSearchTerm}
         currentSearchTerm={searchTerm}
       />
       <SearchNavBar
-        isAxiosOrVanilla={isAxiosOrVanilla}
-        onClickVanilla={handleSearchVanilla}
-        onClickAxios={handleSearchAxios}
-        previous={previousSearch}
-        next={nextSearch}
+        onClick={handleSearch}
+        previous={searchResults.previous}
+        next={searchResults.next}
       />
-      <Table searchResults={searchResults} />
+      <Table searchResults={searchResults.data} />
     </div>
   );
 }

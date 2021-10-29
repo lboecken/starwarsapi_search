@@ -5,6 +5,7 @@ function InputForm(props) {
     props.updateSearchTerm(value);
   }
 
+<<<<<<< HEAD
   if (props.axiosOrVanilla === 'vanilla') {
     return (
       <form
@@ -47,6 +48,25 @@ function InputForm(props) {
       </form>
     );
   }
+=======
+  return (
+    <form
+      onSubmit={(e) => {
+        props.onSubmit(
+          e,
+          `https://swapi.dev/api/people/?search=${props.currentSearchTerm}`
+        );
+      }}>
+      <input
+        type='text'
+        onChange={(e) => handleChangeSearchTerm(e.target.value)}
+        placeholder='Search Your favorite Characters here!'
+        value={props.currentSearchTerm}
+      />
+      <button type='submit'>Submit</button>
+    </form>
+  );
+>>>>>>> refactor2
 }
 
 export default InputForm;
