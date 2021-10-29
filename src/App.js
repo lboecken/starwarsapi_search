@@ -16,7 +16,7 @@ function App() {
   const axios = require('axios');
 
   useEffect(() => {
-    handleSearchVanilla();
+    handleSearch();
   }, []);
 
   async function handleSearch(
@@ -85,7 +85,7 @@ function App() {
             let speciesSearchJSON = await speciesSearch.json();
             result.species = await speciesSearchJSON.name;
             return result;
-          } else {
+          } else if (isAxiosOrVanilla === 'axios') {
             speciesSearch = await fetch(result.species[0]);
             let speciesSearchJSON = await speciesSearch.json();
             result.species = await speciesSearchJSON.name;
