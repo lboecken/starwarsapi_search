@@ -3,8 +3,8 @@ import { nanoid } from 'nanoid';
 
 function Table(props) {
   return (
-    <div>
-      <table>
+    <div className='row mt-3'>
+      <table className='table table-dark'>
         <thead>
           <tr>
             <th>Name</th>

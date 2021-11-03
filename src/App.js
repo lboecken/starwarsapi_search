@@ -3,7 +3,6 @@ import './App.css';
 import InputForm from './components/InputForm';
 import Table from './components/Table';
 import SearchNavBar from './components/SearchNavBar';
-import MethodSelector from './components/MethodSelector';
 
 function App() {
   const [searchResults, setSearchResults] = useState({
@@ -11,42 +10,45 @@ function App() {
     previous: null,
     data: [],
   });
-  const [searchTerm, setSearchTerm] = useState();
+  const [searchTerm, setSearchTerm] = useState('');
   const [isAxiosOrVanilla, setAxiosOrVanilla] = useState('axios');
   const axios = require('axios');
 
   useEffect(() => {
-    handleSearch();
+    querySWAPI();
   }, []);
 
-  async function handleSearch(
+  async function querySWAPI(
     event = null,
     url = 'https://swapi.dev/api/people/?search='
   ) {
     try {
       event && event.preventDefault();
+      let response, searchResultsData, nextPageURL, previousPageURL;
       if (isAxiosOrVanilla === 'vanilla') {
-        let response = await fetch(url);
-        let responseJSON = await response.json();
-        let searchResultsData = await responseJSON.results;
+        response = await fetch(url);
+        response = await response.json();
+        searchResultsData = await response.results;
         searchResultsData = await getHomeworld(searchResultsData);
         searchResultsData = await getSpecies(searchResultsData);
-        setSearchResults({
-          next: responseJSON.next,
-          previous: responseJSON.previous,
-          data: searchResultsData,
-        });
-      } else if (isAxiosOrVanilla === 'axios') {
-        let response = await axios.get(url);
-        let searchResultsData = await response.data.results;
-        searchResultsData = await getHomeworld(searchResultsData);
-        searchResultsData = await getSpecies(searchResultsData);
-        setSearchResults({
-          next: response.data.next,
-          previous: response.data.previous,
-          data: searchResultsData,
-        });
+        console.table(searchResultsData);
+        nextPageURL = response.next;
+        previousPageURL = response.previous;
       }
+      if (isAxiosOrVanilla === 'axios') {
+        response = await axios.get(url);
+        searchResultsData = await response.data.results;
+        searchResultsData = await getHomeworld(searchResultsData);
+        searchResultsData = await getSpecies(searchResultsData);
+        nextPageURL = response.data.next;
+        previousPageURL = response.data.previous;
+      }
+
+      setSearchResults({
+        next: nextPageURL,
+        previous: previousPageURL,
+        data: searchResultsData,
+      });
     } catch (e) {
       console.log(e);
     }
@@ -63,7 +65,8 @@ function App() {
         })
       );
       return updatedSearchResults;
-    } else if (isAxiosOrVanilla === 'axios') {
+    }
+    if (isAxiosOrVanilla === 'axios') {
       const updatedSearchResults = await Promise.all(
         searchResults.map(async (result) => {
           let planetSearch = await axios.get(result.homeworld);
@@ -85,7 +88,7 @@ function App() {
             let speciesSearchJSON = await speciesSearch.json();
             result.species = await speciesSearchJSON.name;
             return result;
-          } else if (isAxiosOrVanilla === 'axios') {
+          } else {
             speciesSearch = await fetch(result.species[0]);
             let speciesSearchJSON = await speciesSearch.json();
             result.species = await speciesSearchJSON.name;
@@ -94,7 +97,8 @@ function App() {
         })
       );
       return updatedSearchResults;
-    } else if (isAxiosOrVanilla === 'axios') {
+    }
+    if (isAxiosOrVanilla === 'axios') {
       const updatedSearchResults = await Promise.all(
         searchResults.map(async (result) => {
           let speciesSearch;
@@ -114,23 +118,24 @@ function App() {
   }
 
   return (
-    <div>
-      <h1>Star Wars Characters Search</h1>
-      <MethodSelector
+    <div className='container'>
+      <div className='row justify-content-center mt-4'>
+        <h1 className='col-10 text-center'>Star Wars Characters Search</h1>
+      </div>
+      <InputForm
+        className='col-6 d-inline'
+        onSubmit={querySWAPI}
+        updateSearchTerm={setSearchTerm}
+        currentSearchTerm={searchTerm}
         setAxiosOrVanilla={setAxiosOrVanilla}
         axiosOrVanilla={isAxiosOrVanilla}
       />
-      <InputForm
-        onSubmit={handleSearch}
-        updateSearchTerm={setSearchTerm}
-        currentSearchTerm={searchTerm}
-      />
+      <Table searchResults={searchResults.data} />
       <SearchNavBar
-        onClick={handleSearch}
+        onClick={querySWAPI}
         previous={searchResults.previous}
         next={searchResults.next}
       />
-      <Table searchResults={searchResults.data} />
     </div>
   );
 }

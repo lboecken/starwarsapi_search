@@ -2,24 +2,25 @@ import React from 'react';
 
 function SearchNavBar(props) {
   return (
-    <ul>
-      <li>
+    <div className='wrapper text-center'>
+      <div className='btn-group text-center'>
         <button
+          className='mx-2'
           onClick={() => {
             props.onClick(null, props.previous);
           }}>
           Previous
         </button>
-      </li>
-      <li>
+
         <button
+          className='mx-2'
           onClick={() => {
             props.onClick(null, props.next);
           }}>
           Next
         </button>
-      </li>
-    </ul>
+      </div>
+    </div>
   );
 }
 export default SearchNavBar;
