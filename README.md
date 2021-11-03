@@ -1,70 +1,32 @@
-# Getting Started with Create React App
+# React based SWAPI Search
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+_A React App that queries the Star Wars API using axios & vanilla Javascript_
 
-## Available Scripts
+Use it [here](https://swapi-search.herokuapp.com/)
 
-In the project directory, you can run:
+![SWAPI SEARCH SCREENSHOT](./public/SWAPIScreenShot.png)
 
-### `npm start`
+## Summary
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Built with:
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+<ul>
+<li>create-react-app</li>
+<li>axios</li>
+<li>fetch</li>
+<li>Async / Await</li>
+<li>Bootstrap</li>
+<li>Heroku</li>
+</ul>
 
-### `npm test`
+A react based, heroku hosted javascript app that queries the Star Wars API for indivdual characters by name. The search functionallity is expressed via 3 functions that query for the character information, the home planet and the species. Due to the design of the API, the latter two searches cannot be done until the inital query returns.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Styling is handled via a minimal amount of bootstrap. The page is functional on mobile devices but has off styling.
 
-### `npm run build`
+A dropdown menu on the app allows the user to switch between the axios library and vanilla javascript fetch to query the API.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Data is pulled as needed, resulting in multiple requests to the API, causing possibly slow load times. Possible solutions would be to either implement a localStorage feature (which would only speed up individual users after they search) or to implement a postgres database that stores all searches after they are made and accessing the database if a search already exists there.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Author & Acknowledgments
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Lennart Boecken
